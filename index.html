@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>proFit Analyzer</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
@@ -44,9 +44,10 @@
             min-height: 100vh;
             transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Animated Mesh Background */
         .bg-mesh {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1; opacity: 0.5; filter: blur(80px);
@@ -71,7 +72,7 @@
             transition: all 0.3s ease;
         }
 
-        .container { max-width: 480px; margin: 30px auto; padding: 0 20px; }
+        .container { max-width: 480px; margin: 30px auto; padding: 0 20px; flex: 1; }
 
         .glass-card {
             background: var(--glass); 
@@ -125,6 +126,7 @@
             background: var(--glass-border); color: var(--text-main);
             border: none; border-radius: var(--radius-xl);
             display: flex; align-items: center; justify-content: center; transition: 0.3s;
+            cursor: pointer;
         }
 
         #results-area { display: none; margin-top: 30px; animation: fadeInUp 0.5s ease; }
@@ -143,6 +145,16 @@
         .detail-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
         .detail-row span:first-child { color: var(--text-muted); font-size: 0.85rem; }
         .detail-row span:last-child { font-weight: 700; font-size: 0.9rem; }
+
+        /* Footer Style */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            opacity: 0.6;
+            margin-top: auto;
+        }
+        .footer p { font-size: 0.7rem; font-weight: 500; color: var(--text-muted); line-height: 1.6; }
+        .footer b { color: var(--text-main); }
 
         /* Modal Overlay */
         .overlay { 
@@ -173,7 +185,7 @@
         </div>
         <div style="display:flex; align-items:center; gap:12px;">
             <button id="nav-upgrade-btn" class="btn-upgrade" onclick="openPayment()">PRO</button>
-            <button onclick="toggleTheme()" style="background:var(--glass-border); border:none; padding:10px; border-radius:12px; color:var(--text-main);">
+            <button onclick="toggleTheme()" style="background:var(--glass-border); border:none; padding:10px; border-radius:12px; color:var(--text-main); cursor:pointer;">
                 <i data-lucide="moon" id="theme-icon"></i>
             </button>
         </div>
@@ -193,7 +205,7 @@
                 <input type="tel" id="jual" placeholder="Rp 0" oninput="formatIDR(this)" inputmode="numeric">
             </div>
             <div class="input-box">
-                <label>Biaya Oprasional/Iklan</label>
+                <label>Biaya Operasional / Iklan</label>
                 <input type="tel" id="ops" placeholder="Rp 0" oninput="formatIDR(this)" inputmode="numeric">
             </div>
             <div class="input-box">
@@ -219,8 +231,8 @@
 
                 <div class="detail-card">
                     <div class="detail-row"><span>Omzet</span><span id="res-omzet">Rp 0</span></div>
-                    <div class="detail-row"><span>Beban Modal</span><span id="res-cogs">Rp 0</span></div>
-                    <div class="detail-row"><span>Operational</span><span id="res-total-ops">Rp 0</span></div>
+                    <div class="detail-row"><span>Beban Modal (COGS)</span><span id="res-cogs">Rp 0</span></div>
+                    <div class="detail-row"><span>Operasional</span><span id="res-total-ops">Rp 0</span></div>
                     <div class="detail-row" style="margin-top:10px; padding-top:10px; border-top:1px solid var(--glass-border);">
                         <span style="font-weight:800; color:var(--primary);">Net Margin</span>
                         <span id="res-margin" style="font-weight:900;">0%</span>
@@ -229,6 +241,10 @@
             </div>
         </div>
     </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 <b>proFit Analyzer</b> by ArdaDinata.<br>Didesain untuk UMKM & Professional Seller.</p>
+    </footer>
 
     <div class="overlay" id="payment-modal">
         <div class="modal animate__animated animate__zoomIn" style="background:var(--glass); padding:35px; border-radius:30px; text-align:center; max-width:380px; width:90%;">
@@ -247,6 +263,7 @@
         lucide.createIcons();
         
         const STORAGE_KEY = "profit_analyzer_pro_status";
+        const QUOTA_KEY = "profit_analyzer_free_quota";
 
         function closeKeyboard(e) {
             if (e.target.tagName !== 'INPUT') {
@@ -261,13 +278,13 @@
 
         function getNum(id) { return parseFloat(document.getElementById(id).value.replace(/\./g, "")) || 0; }
 
-        // --- Logika Asli Kamu ---
         function getDynamicCode() {
             const d = new Date();
             const codes = ["pf_1aB2c", "pf_4eF5g", "pf_7xR9z", "pf_2wK4m", "pf_9pQ1s", "pf_5tB8v", "pf_3nX6c", "pf_8mZ2y", "pf_4kL7w", "pf_1jR9x", "pf_6vM3q", "pf_9dG5f"];
             return codes[d.getMonth()];
         }
 
+        // Handle Activation via URL
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('status') === getDynamicCode()) {
             const exp = new Date().getTime() + (30 * 86400000);
@@ -277,25 +294,38 @@
         }
 
         let userStatus = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { isPro: false };
-        let quota = userStatus.isPro ? Infinity : 3;
+        let quota = parseInt(localStorage.getItem(QUOTA_KEY)) ?? 3;
+        
+        // Reset quota harian sederhana jika diinginkan, tapi di sini kita pakai quota tetap sampai habis
+        if (isNaN(quota)) quota = 3;
 
         function updateUI() {
             const badge = document.getElementById('quota-badge');
-            if (userStatus.isPro) {
+            if (userStatus.isPro && userStatus.expiry > new Date().getTime()) {
                 const days = Math.ceil((userStatus.expiry - new Date().getTime()) / 86400000);
                 badge.innerText = `PRO: ${days} HARI`;
                 badge.style.background = "#f59e0b";
                 document.getElementById('nav-upgrade-btn').style.display = 'none';
             } else {
                 badge.innerText = `FREE: ${quota}x`;
+                badge.style.background = "var(--primary)";
             }
         }
         updateUI();
 
         function calculatePro() {
-            if (!userStatus.isPro && quota <= 0) { openPayment(); return; }
+            const isActuallyPro = userStatus.isPro && userStatus.expiry > new Date().getTime();
+            
+            if (!isActuallyPro && quota <= 0) { 
+                openPayment(); 
+                return; 
+            }
+
             const m = getNum('modal'), j = getNum('jual'), o = getNum('ops'), q = getNum('qty');
-            if (m === 0 || j === 0 || q === 0) return;
+            if (m === 0 || j === 0 || q === 0) {
+                alert("Mohon lengkapi data harga dan qty.");
+                return;
+            }
 
             const omzet = j * q, cogs = m * q, profit = omzet - cogs - o, margin = (profit / omzet) * 100;
             const fmt = (n) => "Rp " + new Intl.NumberFormat('id-ID').format(n);
@@ -311,14 +341,21 @@
             if (profit < 0) {
                 card.style.background = "linear-gradient(135deg, #f43f5e, #e11d48)";
                 card.style.boxShadow = "0 10px 25px rgba(244, 63, 94, 0.4)";
-                document.getElementById('res-advice').innerHTML = "⚠️ Waduh, masih rugi bos!. periksa kembali biaya oprasional";
+                document.getElementById('res-advice').innerHTML = "⚠️ Waduh, masih rugi bos! Periksa kembali biaya operasional.";
             } else {
                 card.style.background = "linear-gradient(135deg, #10b981, #059669)";
                 card.style.boxShadow = "0 10px 25px rgba(16, 185, 129, 0.4)";
-                document.getElementById('res-advice').innerHTML = "🚀 Mantap! Lanjutkan bosku!. performa penjualan menguntungkan. vokus pada peningkatan volume penjualan";
+                document.getElementById('res-advice').innerHTML = "🚀 Mantap! Lanjutkan bosku! Fokus pada peningkatan volume penjualan.";
             }
 
-            if (!userStatus.isPro) { quota--; updateUI(); }
+            if (!isActuallyPro) { 
+                quota--; 
+                localStorage.setItem(QUOTA_KEY, quota);
+                updateUI(); 
+            }
+            
+            // Scroll ke hasil (Mobile friendly)
+            document.getElementById('results-area').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             document.querySelectorAll('input').forEach(i => i.blur());
         }
 
@@ -330,7 +367,11 @@
             lucide.createIcons();
         }
 
-        function resetFields() { location.reload(); }
+        function resetFields() { 
+            document.querySelectorAll('input').forEach(i => i.value = "");
+            document.getElementById('results-area').style.display = 'none';
+        }
+        
         function openPayment() { document.getElementById('payment-modal').style.display = 'flex'; }
         function closePayment() { document.getElementById('payment-modal').style.display = 'none'; }
         function sendWA() { window.open("https://wa.me/6289636503978?text=Halo,%20saya%20sudah%20transfer%20Rp30.000%20untuk%20proFit%20PRO."); }
