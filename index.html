@@ -205,19 +205,19 @@
             
             <div class="input-box">
                 <label>Harga Modal / Unit</label>
-                <input type="text" id="modal" placeholder="Rp 0" oninput="formatIDR(this)">
+                <input type="text" id="modal" placeholder="Rp 0" oninput="formatIDR(this)" autocomplete="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="input-box">
                 <label>Harga Jual / Unit</label>
-                <input type="text" id="jual" placeholder="Rp 0" oninput="formatIDR(this)">
+                <input type="text" id="jual" placeholder="Rp 0" oninput="formatIDR(this)" autocomplete="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="input-box">
                 <label>Biaya Ops / Iklan (Total)</label>
-                <input type="text" id="ops" placeholder="Rp 0" oninput="formatIDR(this)">
+                <input type="text" id="ops" placeholder="Rp 0" oninput="formatIDR(this)" autocomplete="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="input-box">
                 <label>Volume Penjualan (Qty)</label>
-                <input type="text" id="qty" placeholder="0" oninput="this.value = this.value.replace(/\D/g, '')">
+                <input type="text" id="qty" placeholder="0" oninput="this.value = this.value.replace(/\D/g, '')" autocomplete="off" autocapitalize="off" spellcheck="false">
             </div>
 
             <div class="btn-group">
@@ -287,7 +287,6 @@
         const STORAGE_KEY = "profit_analyzer_pro_status";
         const PRO_DURATION_DAYS = 30;
 
-        // FUNGSI KEAMANAN BARU: Kode Acak per Bulan
         function getDynamicCode() {
             const d = new Date();
             const month = d.getMonth();
